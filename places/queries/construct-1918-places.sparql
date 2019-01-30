@@ -1,0 +1,61 @@
+PREFIX ecrm: <http://erlangen-crm.org/current/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX sapo: <http://www.yso.fi/onto/sapo/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX suo: <http://www.yso.fi/onto/suo/>
+PREFIX sipa: <http://ldf.fi/siso/sipa/>
+BASE <http://ldf.fi/siso/sipa/>
+
+CONSTRUCT {
+  
+  sipa:municipality rdfs:subClassOf ecrm:E53_Place ;
+    skos:prefLabel "kunta"@fi .
+  
+  sipa:province rdfs:subClassOf ecrm:E53_Place ;
+    skos:prefLabel "lääni"@fi .
+  
+  sipa:country rdfs:subClassOf ecrm:E53_Place ;
+    skos:prefLabel "maa"@fi .
+  
+  sipa:Suomi a sipa:country ;
+    skos:prefLabel "Suomi"@fi ;
+    skos:exactMatch <http://www.yso.fi/onto/sapo/Suomi(1917-1920)> .
+  
+  ?countyURI a sipa:province ;
+    skos:prefLabel ?countyLabel ;
+    skos:exactMatch ?county .
+  
+  ?placeURI a sipa:municipality ;
+    skos:prefLabel ?placeLabel ;
+    skos:exactMatch ?place ;
+    skos:broader ?countyURI . 
+}
+  
+WHERE {
+  ?place a suo:kunta .
+  ?place sapo:begindate ?startDate .
+  OPTIONAL {
+  	?place sapo:enddate ?endDate .
+  }
+  FILTER (?startDate <= '1918-01-01'^^xsd:date) .
+  FILTER (?endDate >= '1918-01-01'^^xsd:date || !bound(?endDate))
+  ?place sapo:placename ?placeName .
+  
+  OPTIONAL {
+    ?place sapo:partof ?county .
+    ?county sapo:begin ?countyBegin .
+    OPTIONAL {
+      ?county sapo:end ?countyEnd .
+    }
+    FILTER (?countyBegin <= "1918")
+    FILTER (?countyEnd >= "1918" || !bound(?countyEnd))
+    ?county sapo:placename ?countyName .
+  }
+      
+  BIND (URI(ENCODE_FOR_URI(STR(?placeName))) AS ?placeURI) .
+  BIND (STRLANG(?placeName, 'fi') AS ?placeLabel) .
+  
+  BIND (URI(ENCODE_FOR_URI(STR(?countyName))) AS ?countyURI) .
+  BIND (STRLANG(?countyName, 'fi') AS ?countyLabel) .
+}

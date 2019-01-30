@@ -1,0 +1,24 @@
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX sapo: <http://www.yso.fi/onto/sapo/>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX tisc: <http://observedchange.com/tisc/ns#>
+PREFIX sapometa: <http://paikannimet.fi/meta/sapo#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?place ?label ?kuntaLabel ?startDate ?endDate WHERE {
+  ?place a sapometa:Kunta .
+  ?place skos:prefLabel ?label .
+  FILTER (LANG(?label) = 'fi') .
+  ?place tisc:existenceBeginsAt ?startDate .
+  OPTIONAL {
+  	?place tisc:existenceEndsAt ?endDate .
+  }
+  FILTER (?startDate <= '1918-01-01'^^xsd:date) .
+  FILTER (?endDate >= '1918-01-01'^^xsd:date || !bound(?endDate))
+  ?kunta a sapometa:Kuntahistoria .
+  ?kunta tisc:unionOf ?place .
+  ?kunta skos:prefLabel ?kuntaLabel
+}
+ORDER BY ?kuntaLabel
