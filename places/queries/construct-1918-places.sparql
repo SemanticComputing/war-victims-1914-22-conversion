@@ -18,15 +18,15 @@ CONSTRUCT {
   sipa:country rdfs:subClassOf ecrm:E53_Place ;
     skos:prefLabel "maa"@fi .
   
-  sipa:Suomi a sipa:country ;
+  sipa:Suomi a sipa:Country ;
     skos:prefLabel "Suomi"@fi ;
     skos:exactMatch <http://www.yso.fi/onto/sapo/Suomi(1917-1920)> .
   
-  ?countyURI a sipa:province ;
+  ?countyURI a sipa:Province ;
     skos:prefLabel ?countyLabel ;
     skos:exactMatch ?county .
   
-  ?placeURI a sipa:municipality ;
+  ?placeURI a sipa:Municipality ;
     skos:prefLabel ?placeLabel ;
     skos:exactMatch ?place ;
     skos:broader ?countyURI . 
@@ -51,11 +51,11 @@ WHERE {
     FILTER (?countyBegin <= "1918")
     FILTER (?countyEnd >= "1918" || !bound(?countyEnd))
     ?county sapo:placename ?countyName .
+     
+    BIND (URI(ENCODE_FOR_URI(STR(?countyName))) AS ?countyURI) .
+    BIND (STRLANG(?countyName, 'fi') AS ?countyLabel) .
   }
       
   BIND (URI(ENCODE_FOR_URI(STR(?placeName))) AS ?placeURI) .
   BIND (STRLANG(?placeName, 'fi') AS ?placeLabel) .
-  
-  BIND (URI(ENCODE_FOR_URI(STR(?countyName))) AS ?countyURI) .
-  BIND (STRLANG(?countyName, 'fi') AS ?countyLabel) .
 }
