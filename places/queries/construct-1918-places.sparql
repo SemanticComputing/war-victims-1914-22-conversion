@@ -5,31 +5,23 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX suo: <http://www.yso.fi/onto/suo/>
 PREFIX sipa: <http://ldf.fi/siso/sipa/>
+PREFIX sische: <http://ldf.fi/siso/sische/>
 BASE <http://ldf.fi/siso/sipa/>
 
 CONSTRUCT {
   
-  sipa:municipality rdfs:subClassOf ecrm:E53_Place ;
-    skos:prefLabel "kunta"@fi .
-  
-  sipa:province rdfs:subClassOf ecrm:E53_Place ;
-    skos:prefLabel "lääni"@fi .
-  
-  sipa:country rdfs:subClassOf ecrm:E53_Place ;
-    skos:prefLabel "maa"@fi .
-  
-  sipa:Suomi a sipa:Country ;
+  sische:Suomi a sische:Country ;
     skos:prefLabel "Suomi"@fi ;
     skos:exactMatch <http://www.yso.fi/onto/sapo/Suomi(1917-1920)> .
   
-  ?countyURI a sipa:Province ;
+  ?countyURI a sische:Province ;
     skos:prefLabel ?countyLabel ;
     skos:exactMatch ?county .
   
-  ?placeURI a sipa:Municipality ;
+  ?placeURI a sische:Municipality ;
     skos:prefLabel ?placeLabel ;
     skos:exactMatch ?place ;
-    skos:broader ?countyURI . 
+    skos:broader ?countyURI .
 }
   
 WHERE {
@@ -51,11 +43,33 @@ WHERE {
     FILTER (?countyBegin <= "1918")
     FILTER (?countyEnd >= "1918" || !bound(?countyEnd))
     ?county sapo:placename ?countyName .
-     
-    BIND (URI(ENCODE_FOR_URI(STR(?countyName))) AS ?countyURI) .
+    
+    BIND (STRAFTER(STR(?county), 'http://www.yso.fi/onto/sapo/') AS ?countyCode) .
+    BIND (URI(STRBEFORE(STR(?countyCode), '(')) AS ?countyURI) .
     BIND (STRLANG(?countyName, 'fi') AS ?countyLabel) .
   }
-      
-  BIND (URI(ENCODE_FOR_URI(STR(?placeName))) AS ?placeURI) .
-  BIND (STRLANG(?placeName, 'fi') AS ?placeLabel) .
+  
+  BIND (STRAFTER(STR(?place), 'http://www.yso.fi/onto/sapo/') AS ?sapoCode)
+  BIND (STRBEFORE(STR(?sapoCode), "(") AS ?code)
+  
+  BIND (
+    IF(STR(?code) = 'Salo', 'Salo_Ol',
+    IF(STR(?code) = 'Salo_2', 'Salo_Tl',
+    IF(STR(?code) = 'Ulvila_2', 'Ulvila',
+    IF(STR(?code) = 'Degerby_2', 'Degerby',
+            STR(?code)))))
+              AS ?placeCode)
+  
+  BIND (
+    IF(STR(?placeName) = 'Salo', 'Salo (Ol.)',
+    IF(STR(?placeName) = 'Salo_2', 'Salo (Tl.)',
+    IF(STR(?placeName) = 'Ulvila_2', 'Ulvila',
+    IF(STR(?placeName) = 'Degerby_2', 'Degerby',
+            STR(?placeName)))))
+              AS ?placeCorrectedName)
+  
+  BIND (URI(STR(?placeCode)) AS ?placeURI) .
+  BIND (STRLANG(?placeCorrectedName, 'fi') AS ?placeLabel) .
 }
+
+
