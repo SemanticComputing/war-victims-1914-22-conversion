@@ -72,4 +72,3 @@ WHERE {
   BIND (STRLANG(?placeCorrectedName, 'fi') AS ?placeLabel) .
 }
 
-

@@ -2,4 +2,6 @@ turtle/
 *.ttl
 env/
 .idea
+data/
+.~lock*
 
