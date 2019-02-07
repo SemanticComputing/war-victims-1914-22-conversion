@@ -2,7 +2,7 @@ from rdflib import Graph, Literal, namespace, Namespace, XSD, URIRef
 
 dc = Namespace('http://purl.org/dc/elements/1.1/')
 sische = Namespace('http://ldf.fi/siso/sische/')
-ecrm = Namespace('http://erlangen-crm.org/')
+ecrm = Namespace('http://erlangen-crm.org/current/')
 
 
 schema_graph = Graph()
@@ -42,7 +42,7 @@ def add_event_schema(g):
     g.add((sische.end_date, namespace.RDFS.range, XSD.date))
 
     g.add((sische.Battle, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((sische.Battle, namespace.RDFS.subClassOf, sische.event))
+    g.add((sische.Battle, namespace.RDFS.subClassOf, sische.Event))
     g.add((sische.Battle, namespace.SKOS.prefLabel, Literal('Taistelu', lang='fi')))
 
 
