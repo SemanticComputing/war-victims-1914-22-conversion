@@ -5,28 +5,23 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX suo: <http://www.yso.fi/onto/suo/>
 PREFIX sipa: <http://ldf.fi/siso/sipa/>
-PREFIX sische: <http://ldf.fi/siso/schema/>
+PREFIX sische: <http://ldf.fi/siso/sische/>
 BASE <http://ldf.fi/siso/sipa/>
 
 CONSTRUCT {
   
-  ?Suomi a sische:Place ;
+  sische:Suomi a sische:Country ;
     skos:prefLabel "Suomi"@fi ;
-    skos:exactMatch <http://www.yso.fi/onto/sapo/Suomi(1917-1920)> ;
-    ecrm:P2_has_type sische:Country .
+    skos:exactMatch <http://www.yso.fi/onto/sapo/Suomi(1917-1920)> .
   
-  ?countyURI a sische:Place ;
+  ?countyURI a sische:Province ;
     skos:prefLabel ?countyLabel ;
-    skos:exactMatch ?county ;
-    ecrm:P2_has_type sische:Province ;
-    skos:broder ?Suomi .
-      
-  ?placeURI a sische:Place ;
+    skos:exactMatch ?county .
+  
+  ?placeURI a sische:Municipality ;
     skos:prefLabel ?placeLabel ;
     skos:exactMatch ?place ;
-    skos:broader ?countyURI ;
-    ecrm:P2_has_type sische:Municipality .
-    
+    skos:broader ?countyURI .
 }
   
 WHERE {
@@ -75,7 +70,6 @@ WHERE {
   
   BIND (URI(STR(?placeCode)) AS ?placeURI) .
   BIND (STRLANG(?placeCorrectedName, 'fi') AS ?placeLabel) .
-  
-  BIND (URI('Suomi') AS ?Suomi) .
 }
+
 

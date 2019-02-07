@@ -15,26 +15,26 @@ def add_place_schema(g):
     g.add((sische.Place, namespace.RDFS.subClassOf, ecrm.E53_Place))
     g.add((sische.Place, namespace.SKOS.prefLabel, Literal('Paikka', lang='fi')))
 
-    #g.add((sische.Municipality, namespace.RDF.type, namespace.RDFS.Class))
-    #g.add((sische.Municipality, namespace.RDFS.subClassOf, sische.Place))
-    #g.add((sische.Municipality, namespace.SKOS.prefLabel, Literal('Kunta', lang='fi')))
-
-    #g.add((sische.Province, namespace.RDF.type, namespace.RDFS.Class))
-    #g.add((sische.Province, namespace.RDFS.subClassOf, sische.Place))
-    #g.add((sische.Province, namespace.SKOS.prefLabel, Literal('Lääni', lang='fi')))
-
-    #g.add((sische.Country, namespace.RDF.type, namespace.RDFS.Class))
-    #g.add((sische.Country, namespace.RDFS.subClassOf, sische.Place))
-    #g.add((sische.Country, namespace.SKOS.prefLabel, Literal('Maa', lang='fi')))
-
-    g.add((sische.Municipality, namespace.RDF.type, ecrm.E55_Type))
+    g.add((sische.Municipality, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((sische.Municipality, namespace.RDFS.subClassOf, sische.Place))
     g.add((sische.Municipality, namespace.SKOS.prefLabel, Literal('Kunta', lang='fi')))
 
-    g.add((sische.Province, namespace.RDF.type, ecrm.E55_Type)))
+    g.add((sische.Province, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((sische.Province, namespace.RDFS.subClassOf, sische.Place))
     g.add((sische.Province, namespace.SKOS.prefLabel, Literal('Lääni', lang='fi')))
 
-    g.add((sische.Country, namespace.RDF.type, ecrm.E55_Type)))
+    g.add((sische.Country, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((sische.Country, namespace.RDFS.subClassOf, sische.Place))
     g.add((sische.Country, namespace.SKOS.prefLabel, Literal('Maa', lang='fi')))
+
+    #g.add((sische.Municipality, namespace.RDF.type, ecrm.E55_Type))
+    #g.add((sische.Municipality, namespace.SKOS.prefLabel, Literal('Kunta', lang='fi')))
+
+    #g.add((sische.Province, namespace.RDF.type, ecrm.E55_Type)))
+    #g.add((sische.Province, namespace.SKOS.prefLabel, Literal('Lääni', lang='fi')))
+
+    #g.add((sische.Country, namespace.RDF.type, ecrm.E55_Type)))
+    #g.add((sische.Country, namespace.SKOS.prefLabel, Literal('Maa', lang='fi')))
 
 
 def add_event_schema(g):
