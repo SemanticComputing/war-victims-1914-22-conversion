@@ -1,5 +1,6 @@
 from rdflib import Graph, Literal, namespace, Namespace, XSD, URIRef
 import csv
+import requests
 
 # meaning of columns in csv
 
@@ -58,6 +59,12 @@ def read(csv_file, g):
         if town_uri:
             g.add((uri, schema.greater_place, URIRef(town_uri)))
 
+        # Exact place
+        g.add((uri, schema.exact_place_name, Literal(row[EXACT_PLACE])))
+        exact_place_uri = get_exact_place(row[EXACT_PLACE], row[CURRENT_MUNICIPALITY])
+        if exact_place_uri:
+            g.add((uri, schema.pnr, URIRef(exact_place_uri)))
+
         counter = counter + 1
 
 
@@ -87,6 +94,32 @@ def get_municipality(place_g, place):
             return row[0]
     else:
         return False
+
+
+def get_exact_place(exact_name, greater_modern_name):
+    q = '''
+                    PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+                    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                    PREFIX pnr-schema: <http://ldf.fi/pnr-schema#>
+
+                    SELECT ?place
+                    WHERE {
+                      ?place a pnr-schema:place_type_560  .
+                      ?place skos:prefLabel "''' + exact_name + '''"@fi .
+                      ?place crm:P89_falls_within ?biggerPlace .
+                      ?biggerPlace skos:prefLabel "''' + greater_modern_name + '''"@fi .
+                    }
+                '''
+
+    response = requests.post('http://ldf.fi/pnr/sparql',
+                             data={'query': q})
+
+    response_json = response.json()['results']['bindings']
+
+    for row in response_json:
+        return row['place']['value']
+
+    return False
 
 
 csv_reader = csv.reader(open('data/taistelupaikat.csv', 'r'))

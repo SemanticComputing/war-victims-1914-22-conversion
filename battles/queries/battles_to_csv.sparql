@@ -1,0 +1,18 @@
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX siso-schema: <http://ldf.fi/siso/schema/>
+                
+SELECT ?battle ?label ?exact_place_name ?pnr ?placeName ?municipality WHERE {
+  ?battle a siso-schema:Battle .
+  ?battle skos:prefLabel ?label .
+  ?battle siso-schema:greater_place_name ?placeName .
+  OPTIONAL {
+  	?battle siso-schema:greater_place ?municipality .
+  }
+    OPTIONAL {
+    ?battle siso-schema:exact_place_name ?exact_place_name .
+  }
+  OPTIONAL {
+    ?battle siso-schema:pnr ?pnr .
+  }
+}
+ORDER BY ?battle
