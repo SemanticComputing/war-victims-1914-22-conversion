@@ -10,6 +10,7 @@ def get_units(csv_file, g):
         if row[7]:
             unit_list = row[7].split('|')
             for unit in unit_list:
+                unit = unit.strip()
                 q = g.query("""
                             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                             PREFIX siso-schema: <http://ldf.fi/siso/schema/>
@@ -18,8 +19,9 @@ def get_units(csv_file, g):
                             WHERE {
                                 ?unit a siso-schema:Unit .
                                 ?unit skos:prefLabel ?label .
+                                FILTER (str(?label) = str(?unitName)) .
                              }
-                            """, initBindings={'label': unit})
+                            """, initBindings={'unitName': unit})
                 if not q:
                     uri = URIRef(sijo['u_' + str(counter).zfill(6)])
                     g.add((uri, namespace.RDF.type, schema.Unit))

@@ -28,7 +28,11 @@ sita = Namespace('http://ldf.fi/siso/sita/')
 
 
 def read(csv_file, g):
+    place_graph = Graph()
+    place_graph.parse('data/finland_municipalities_1918.ttl', format='turtle')
+
     counter = 2  # start at first information row of the corresponding excel-file to make comparison easier
+
     for row in csv_file:
         uri = URIRef(sita['b_' + str(counter).zfill(6)])
         g.add((uri, namespace.RDF.type, schema.Battle))
@@ -47,6 +51,13 @@ def read(csv_file, g):
         else:
             g.add((uri, schema.end_date, Literal(convert_date(row[START_DATE]), datatype=XSD.date)))
 
+        # Municipality
+        town = row[GREATER_PLACE]
+        g.add((uri, schema.greater_place_name, Literal(town)))
+        town_uri = get_municipality(place_graph, town)
+        if town_uri:
+            g.add((uri, schema.greater_place, URIRef(town_uri)))
+
         counter = counter + 1
 
 
@@ -58,6 +69,24 @@ def convert_date(date):
 
     date_split = date.split('/')
     return date_split[2] + '-' + date_split[1] + '-' + date_split[0]
+
+
+def get_municipality(place_g, place):
+    q = place_g.query('''
+                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                PREFIX siso-schema: <http://ldf.fi/siso/schema/>
+                    
+                SELECT ?place WHERE {
+                    ?place a siso-schema:Municipality .
+                    ?place skos:prefLabel ?label .
+                    FILTER(STR(?label) = STR(?placeName) ) .
+                }
+                ''', initBindings={'placeName': place})
+    if q:
+        for row in q:
+            return row[0]
+    else:
+        return False
 
 
 csv_reader = csv.reader(open('data/taistelupaikat.csv', 'r'))
