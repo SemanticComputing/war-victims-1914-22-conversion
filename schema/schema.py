@@ -54,6 +54,16 @@ def add_event_schema(g):
     g.add((sische.Battle, namespace.RDFS.subClassOf, sische.Event))
     g.add((sische.Battle, namespace.SKOS.prefLabel, Literal('Taistelu', lang='fi')))
 
+    g.add((sische.greater_place, namespace.RDF.type, namespace.RDF.Property))
+    g.add((sische.greater_place, namespace.SKOS.prefLabel, Literal('Kunta tai muu suurempi alue, jossa tapahtuma tapahtui', lang='fi')))
+    g.add((sische.greater_place, namespace.RDFS.subPropertyOf, ecrm.P7_took_place_at))
+    g.add((sische.greater_place, namespace.RDF.type, namespace.OWL.ObjectProperty))
+
+    g.add((ecrm.P7_took_place_at, namespace.RDF.type, namespace.OWL.ObjectProperty))
+
+    g.add((ecrm.P10_falls_within, namespace.RDF.type, namespace.OWL.ObjectProperty))
+
+
 
 add_place_schema(schema_graph)
 add_event_schema(schema_graph)

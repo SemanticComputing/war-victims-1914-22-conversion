@@ -23,6 +23,7 @@ LONG = 12
 
 schema = Namespace('http://ldf.fi/siso/schema/')
 sita = Namespace('http://ldf.fi/siso/sita/')
+ecrm = Namespace('http://erlangen-crm.org/current/')
 
 
 ##################
@@ -35,7 +36,7 @@ def read(csv_file, g):
     counter = 2  # start at first information row of the corresponding excel-file to make comparison easier
 
     for row in csv_file:
-        uri = URIRef(sita['b_' + str(counter).zfill(6)])
+        uri = URIRef(sita['e_' + str(counter).zfill(6)])
         g.add((uri, namespace.RDF.type, schema.Battle))
 
         # If name-row is empty, then label is the front-row
@@ -54,16 +55,19 @@ def read(csv_file, g):
 
         # Municipality
         town = row[GREATER_PLACE]
-        g.add((uri, schema.greater_place_name, Literal(town)))
+        #g.add((uri, schema.greater_place_name, Literal(town)))
         town_uri = get_municipality(place_graph, town)
         if town_uri:
             g.add((uri, schema.greater_place, URIRef(town_uri)))
 
         # Exact place
-        g.add((uri, schema.exact_place_name, Literal(row[EXACT_PLACE])))
-        exact_place_uri = get_exact_place(row[EXACT_PLACE], row[CURRENT_MUNICIPALITY])
-        if exact_place_uri:
-            g.add((uri, schema.pnr, URIRef(exact_place_uri)))
+        #g.add((uri, schema.exact_place_name, Literal(row[EXACT_PLACE])))
+        #exact_place_uri = get_exact_place(row[EXACT_PLACE], row[CURRENT_MUNICIPALITY])
+        #if exact_place_uri:
+        #    g.add((uri, schema.pnr, URIRef(exact_place_uri)))
+
+        # Add all battles as parts of the Finnish civil war
+        g.add((uri, ecrm.P10_falls_within, sita.e_00001))
 
         counter = counter + 1
 
@@ -122,12 +126,20 @@ def get_exact_place(exact_name, greater_modern_name):
     return False
 
 
+def add_civil_war(g):
+    g.add((sita.e_00001, namespace.RDF.type, schema.Event))
+    g.add((sita.e_00001, namespace.SKOS.prefLabel, Literal("Suomen sisällissota", lang='fi')))
+    g.add((sita.e_00001, schema.start_date, Literal('1918-27-01', datatype=XSD.date)))
+    g.add((sita.e_00001, schema.end_date, Literal('1918-15-05', datatype=XSD.date)))
+
 csv_reader = csv.reader(open('data/taistelupaikat.csv', 'r'))
 
 graph = Graph()
 graph.bind('siso-schema', schema)
 graph.bind('sita', sita)
 graph.bind('skos', namespace.SKOS)
+
+add_civil_war(graph)
 
 read(csv_reader, graph)
 graph.serialize('turtle/battles.ttl', format='turtle')
