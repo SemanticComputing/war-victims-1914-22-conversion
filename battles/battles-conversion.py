@@ -86,7 +86,7 @@ def get_municipality(place_g, place):
     q = place_g.query('''
                 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                 PREFIX siso-schema: <http://ldf.fi/siso/schema/>
-                    
+
                 SELECT ?place WHERE {
                     ?place a siso-schema:Municipality .
                     ?place skos:prefLabel ?label .
@@ -132,6 +132,25 @@ def add_civil_war(g):
     g.add((sita.e_00001, schema.start_date, Literal('1918-27-01', datatype=XSD.date)))
     g.add((sita.e_00001, schema.end_date, Literal('1918-15-05', datatype=XSD.date)))
 
+# function to add unclear fields
+
+def unclear_fields(g, reader):
+    counter = 2
+    for row in reader:
+        uri = URIRef(sita['e_' + str(counter).zfill(6)])
+        if row[UNITS]:
+            g.add((uri, schema.units, Literal(row[UNITS], lang='fi')))
+        if row[PERSONS]:
+            g.add((uri, schema.persons, Literal(row[PERSONS], lang='fi')))
+        if row[REFERENCE]:
+            g.add((uri, schema.reference, Literal(row[REFERENCE], lang='fi')))
+        if row[UNCLEAR]:
+            g.add((uri, schema.unclear, Literal(row[UNCLEAR], lang='fi')))
+
+        counter = counter + 1
+
+
+
 csv_reader = csv.reader(open('data/taistelupaikat.csv', 'r'))
 
 graph = Graph()
@@ -139,10 +158,20 @@ graph.bind('siso-schema', schema)
 graph.bind('sita', sita)
 graph.bind('skos', namespace.SKOS)
 
-add_civil_war(graph)
+#add_civil_war(graph)
 
-read(csv_reader, graph)
-graph.serialize('turtle/battles.ttl', format='turtle')
+#read(csv_reader, graph)
+#graph.serialize('turtle/battles.ttl', format='turtle')
+
+#unclear_fields(graph, csv_reader)
+
+#graph.serialize('turtle/extras.ttl', format='turtle')
+
+graph.parse('data/korjattu/sita.owl')
+graph.parse('turtle/exact_places.ttl', format='turtle')
+graph.parse('turtle/extras.ttl', format='turtle')
+
+graph.serialize('turtle/battles_full.ttl', format='turtle')
 
 if __name__ == "__main__":
     import doctest
